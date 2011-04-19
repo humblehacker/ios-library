@@ -44,6 +44,7 @@ NSString *const UAContentsDisplayOrderPrice = @"priceNumber";
 @synthesize status;
 @synthesize orderBy;
 @synthesize purchasingProductIdentifier;
+@synthesize products;
 
 #pragma mark -
 #pragma mark Memory management

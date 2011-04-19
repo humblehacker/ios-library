@@ -48,11 +48,14 @@
     BOOL orderAscending;
 
     NSString *purchasingProductIdentifier;
+  
+    Class productClass;
 }
 
 @property (nonatomic, assign) UAInventoryStatus status;
 @property (nonatomic, retain) NSString *orderBy;
 @property (nonatomic, retain) NSString *purchasingProductIdentifier;
+@property (nonatomic, readonly) NSDictionary *products;
 
 - (void)loadInventory;
 - (void)groupInventory;

@@ -83,6 +83,8 @@ typedef enum UAProductStatus {
 @property (nonatomic, assign) SKPaymentTransaction *transaction;
 
 - (id)init;
+- (id)initWithDictionary:(NSDictionary *)item;
++ (void)registerProductClass:(Class)productClass;
 + (UAProduct *)productFromDictionary:(NSDictionary *)item;
 - (NSComparisonResult)compare:(UAProduct*)product;
 - (void)resetStatus;

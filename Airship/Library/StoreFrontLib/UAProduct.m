@@ -28,6 +28,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "UAStoreFront.h"
 #import "UAStoreFrontDownloadManager.h"
 
+static Class gProductClass = nil;
+
 @implementation UAProduct
 
 @synthesize productIdentifier;
@@ -76,6 +78,39 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     return self;
 }
 
+- (id)initWithDictionary:(NSDictionary *)item {
+  if (![self init])
+    return nil;
+  
+  self.productIdentifier = [item objectForKey: @"product_id"];
+  
+  NSString* aPreviewURL =  [item objectForKey: @"preview_url"]==nil ? @"" : [item objectForKey: @"preview_url"];
+  if (aPreviewURL != nil && ![aPreviewURL isEqualToString:@""]) {
+    self.previewURL = [NSURL URLWithString: aPreviewURL];
+  }
+  
+  NSString* aDownloadURL = [item objectForKey: @"download_url"]==nil ? @"" : [item objectForKey: @"download_url"];
+  self.downloadURL = [NSURL URLWithString: aDownloadURL];
+  
+  NSString* anIconURL = [item objectForKey: @"icon_url"]== nil ? @"" : [item objectForKey: @"icon_url"];
+  self.iconURL = [NSURL URLWithString: anIconURL];
+  
+  self.title = [item objectForKey: @"name"];
+  self.isFree = NO;
+  if([item objectForKey: @"free"] != [NSNull null] && [[item objectForKey: @"free"] intValue] != 0) {
+    self.isFree = YES;
+    self.price = @"FREE";
+  }
+  
+  self.productDescription = [item objectForKey: @"description"];
+  self.revision = [[item objectForKey: @"current_revision"] intValue];
+  self.fileSize = [[item objectForKey:@"file_size"] doubleValue];
+  
+  [self resetStatus];
+  
+  return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     UAProduct *copy = [[[self class] allocWithZone:zone] init];
     copy.productIdentifier = self.productIdentifier;
@@ -120,36 +155,22 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     return [[receipt copy] autorelease];
 }
 
++ (void)registerProductClass:(Class)productClass
+{
+  assert(gProductClass == nil);
+  gProductClass = productClass;
+}
+
++ (Class)productClass
+{
+  if (!gProductClass)
+    [self registerProductClass:self];
+  return gProductClass;
+}
+
 + (UAProduct *)productFromDictionary:(NSDictionary *)item {
 
-    UAProduct* product = [[UAProduct alloc] init];
-    product.productIdentifier = [item objectForKey: @"product_id"];
-
-    NSString* previewURL =  [item objectForKey: @"preview_url"]==nil ? @"" : [item objectForKey: @"preview_url"];
-    if (previewURL != nil && ![previewURL isEqualToString:@""]) {
-        product.previewURL = [NSURL URLWithString: previewURL];
-    }
-
-    NSString* downloadURL = [item objectForKey: @"download_url"]==nil ? @"" : [item objectForKey: @"download_url"];
-    product.downloadURL = [NSURL URLWithString: downloadURL];
-
-    NSString* iconURL = [item objectForKey: @"icon_url"]== nil ? @"" : [item objectForKey: @"icon_url"];
-    product.iconURL = [NSURL URLWithString: iconURL];
-
-    product.title = [item objectForKey: @"name"];
-    product.isFree = NO;
-    if([item objectForKey: @"free"] != [NSNull null] && [[item objectForKey: @"free"] intValue] != 0) {
-        product.isFree = YES;
-        product.productDescription = [item objectForKey: @"description"];
-        product.price = @"FREE";
-    }
-
-    product.revision = [[item objectForKey: @"current_revision"] intValue];
-    product.fileSize = [[item objectForKey:@"file_size"] doubleValue];
-
-    [product resetStatus];
-
-    return [product autorelease];
+  return [[[[self productClass] alloc] initWithDictionary:item] autorelease];
 }
 
 #pragma mark -
