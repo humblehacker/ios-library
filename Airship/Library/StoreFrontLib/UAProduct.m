@@ -28,7 +28,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #import "UAStoreFront.h"
 #import "UAStoreFrontDownloadManager.h"
 
-static Class gProductClass = nil;
+static ProductFactory gProductFactory = nil;
 
 @implementation UAProduct
 
@@ -155,22 +155,16 @@ static Class gProductClass = nil;
     return [[receipt copy] autorelease];
 }
 
-+ (void)registerProductClass:(Class)productClass
++ (void)registerProductFactory:(ProductFactory)productFactory
 {
-  assert(gProductClass == nil);
-  gProductClass = productClass;
-}
-
-+ (Class)productClass
-{
-  if (!gProductClass)
-    [self registerProductClass:self];
-  return gProductClass;
+  assert(gProductFactory == nil);
+  gProductFactory = [productFactory copy];
 }
 
 + (UAProduct *)productFromDictionary:(NSDictionary *)item {
-
-  return [[[[self productClass] alloc] initWithDictionary:item] autorelease];
+  if (!gProductFactory)
+    return [[[UAProduct alloc] initWithDictionary:item] autorelease];
+  return gProductFactory(item);
 }
 
 #pragma mark -

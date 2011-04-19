@@ -39,6 +39,8 @@ typedef enum UAProductStatus {
     UAProductStatusHasUpdate
 } UAProductStatus;
 
+@class UAProduct;
+typedef UAProduct* (^ProductFactory)(NSDictionary *dict);
 
 @interface UAProduct : UAObservable <NSCopying, UA_ASIProgressDelegate> {
     NSString *productIdentifier;
@@ -84,7 +86,7 @@ typedef enum UAProductStatus {
 
 - (id)init;
 - (id)initWithDictionary:(NSDictionary *)item;
-+ (void)registerProductClass:(Class)productClass;
++ (void)registerProductFactory:(ProductFactory)productFactory;
 + (UAProduct *)productFromDictionary:(NSDictionary *)item;
 - (NSComparisonResult)compare:(UAProduct*)product;
 - (void)resetStatus;
