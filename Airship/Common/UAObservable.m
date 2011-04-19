@@ -26,6 +26,19 @@
 #import "UAirship.h"
 #import "UAObservable.h"
 
+@implementation NSMutableSet (WeakReferences)
++ (id)mutableSetUsingWeakReferences
+{
+	return [self mutableSetUsingWeakReferencesWithCapacity:0];
+}
+
++ (id)mutableSetUsingWeakReferencesWithCapacity:(NSUInteger)capacity
+{
+	CFSetCallBacks callbacks = {0, NULL, NULL, CFCopyDescription, CFEqual};
+	// We create a weak reference Set
+	return (id)(CFSetCreateMutable(0, capacity, &callbacks));
+}
+@end
 
 @implementation UAObservable
 
@@ -40,7 +53,7 @@
 -(id)init {
     @synchronized(self) {
         if(self = [super init]) {
-            observers = [[NSMutableSet alloc] init];
+            observers = [NSMutableSet mutableSetUsingWeakReferences];
             observerLock = [[NSLock alloc] init];
         }
     }

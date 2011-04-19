@@ -39,3 +39,9 @@
 -(int)countObservers;
 
 @end
+
+@interface NSMutableSet (WeakReferences)
++ (id)mutableSetUsingWeakReferences;
++ (id)mutableSetUsingWeakReferencesWithCapacity:(NSUInteger)capacity;
+@end;
+
